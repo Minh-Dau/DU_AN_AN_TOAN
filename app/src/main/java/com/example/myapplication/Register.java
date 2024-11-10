@@ -18,7 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class Register extends AppCompatActivity {
-    EditText name,email,pass1,pass2;
+    EditText name,email,sodienthoai,pass1,pass2;
     Button nhan_dangky;
     TextView nhan_dangnhap;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
@@ -32,6 +32,7 @@ public class Register extends AppCompatActivity {
         pass2=findViewById(R.id.edit_pass2);
         nhan_dangky=findViewById(R.id.btn_dangky);
         nhan_dangnhap=findViewById(R.id.edit_dangnhap);
+        sodienthoai=findViewById(R.id.edit_sdt);
         nhan_dangnhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,6 +48,7 @@ public class Register extends AppCompatActivity {
                 String email_text=email.getText().toString();
                 String pass1_text=pass1.getText().toString();
                 String pass2_text=pass2.getText().toString();
+                String sodienthoai_text=sodienthoai.getText().toString();
                 if(name_text.isEmpty()||email_text.isEmpty()||pass1_text.isEmpty()||pass2_text.isEmpty()){
                     Toast.makeText(Register.this,"Dien Thong Tin",Toast.LENGTH_SHORT).show();
                 }
@@ -65,6 +67,7 @@ public class Register extends AppCompatActivity {
                                 databaseReference.child("users").child(name_text).child("Name").setValue(name_text);
                                 databaseReference.child("users").child(name_text).child("Email").setValue(email_text);
                                 databaseReference.child("users").child(name_text).child("Password").setValue(pass1_text);
+                                databaseReference.child("users").child(name_text).child("Sodienthoai").setValue(sodienthoai_text);
                                 Toast.makeText(Register.this,"Đăng ký thành công",Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(Register.this, Register.class); // Restart the same activity
                                 startActivity(intent);
