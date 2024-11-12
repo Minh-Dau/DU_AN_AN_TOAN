@@ -12,8 +12,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        nhan=findViewById(R.id.nhan);
+        setContentView(R.layout.activity_login);
+//        nhan=findViewById(R.id.nhan);
         nhan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

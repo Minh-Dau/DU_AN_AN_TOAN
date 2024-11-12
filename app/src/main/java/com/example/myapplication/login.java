@@ -54,7 +54,7 @@ public class login extends AppCompatActivity {
                                 String getpassword=snapshot.child(name_text).child("Password").getValue(String.class);
                                 if(getpassword.equals(password_text)){
                                     Toast.makeText(login.this,"Dang nhap thanh cong",Toast.LENGTH_SHORT).show();
-                                    Intent intent =new Intent(getApplicationContext(),show.class);
+                                    Intent intent =new Intent(getApplicationContext(),send_otp2.class);
                                     startActivity(intent);
                                     finish();
                                 }

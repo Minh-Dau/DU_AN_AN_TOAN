@@ -7,14 +7,22 @@
     tools:context=".Register">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
         android:gravity="center">
 
+        <ImageView
+            android:layout_width="130dp"
+            android:layout_height="130dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/logo"
+            />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
             android:text="ĐĂNG KÝ TÀI KHOẢN"
             android:textSize="24sp"
             android:textStyle="bold"
