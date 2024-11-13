@@ -37,8 +37,7 @@ public class resetPassword extends AppCompatActivity {
         chkShowPass = findViewById(R.id.chkShowPass);
         btnLuuPass = findViewById(R.id.btnLuuPass);
 
-        String username = getIntent().getStringExtra("username");
-
+        String id = getIntent().getStringExtra("id");
 
         chkShowPass.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -79,7 +78,7 @@ public class resetPassword extends AppCompatActivity {
                     textError.setText(""); // Xóa thông báo lỗi nếu có
 
                     // Cập nhật mật khẩu vào Firebase
-                    databaseReference.child("users").child(username).child("Password").setValue(matKhau)
+                    databaseReference.child("users").child(id).child("Password").setValue(matKhau)
                             .addOnSuccessListener(aVoid -> {
                                 // Thông báo thành công
                                 textError.setText("Mật khẩu đã được cập nhật thành công.");

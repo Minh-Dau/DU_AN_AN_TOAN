@@ -89,67 +89,46 @@ public class login extends AppCompatActivity {
             }
         });
 
-        nhan_quenmk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        nhan_quenmk.setOnClickListener(view -> {
+            EditText resetName = new EditText(view.getContext());
+            AlertDialog.Builder passwordResetDialog = new AlertDialog.Builder(view.getContext());
+            passwordResetDialog.setTitle("Reset Password ?");
+            passwordResetDialog.setMessage("Enter your UserName To Received Reset Link.");
+            passwordResetDialog.setView(resetName);
 
-                EditText resetName = new EditText(v.getContext());
-                AlertDialog.Builder passwordResetDialog = new AlertDialog.Builder(v.getContext());
-                passwordResetDialog.setTitle("Reset Password ?");
-                passwordResetDialog.setMessage("Enter your UserName To Received Reset Link.");
-                passwordResetDialog.setView(resetName);
+            passwordResetDialog.setPositiveButton("Yes", (dialog, which) -> {
+                String username = resetName.getText().toString();
 
-                passwordResetDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which){
-                        String username = resetName.getText().toString();
+                // Gọi phương thức để lấy thông tin người dùng từ Firebase
+                getUserDetailsByUsername(username).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        User user = task.getResult();
 
-                        getEmailByUsername(username).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                String email = task.getResult();
-                                // Xử lý email lấy được
-
-                                Intent intent = new Intent(login.this, resetPassword.class);
-                                intent.putExtra("email", email);
-                                intent.putExtra("username", username);
-                                login.this.startActivity(intent);
-
-//                                fAuth.sendPasswordResetEmail(email).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void unused) {
-//                                        Toast.makeText(login.this, "Link Reset Password sent to your Email.", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                }).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        Toast.makeText(login.this, "Error! Link Reset Password is NOT SEND " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-
-                            } else {
-                                // Xử lý lỗi
-                                Toast.makeText(getApplicationContext(), "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
+                        // Truyền tất cả thông tin qua Intent
+                        Intent intent = new Intent(login.this, resetPassword.class);
+                        intent.putExtra("id", user.getId());
+                        intent.putExtra("email", user.getEmail());
+                        intent.putExtra("password", user.getPassword());
+                        intent.putExtra("name", user.getName());
+                        intent.putExtra("sdt", user.getSDT());
+                        startActivity(intent);
+                    } else {
+                        // Xử lý lỗi
+                        Toast.makeText(getApplicationContext(), "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+            });
 
-                passwordResetDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                             // close the dialog
-                    }
-                });
+            passwordResetDialog.setNegativeButton("No", (dialog, which) -> {
+                // Close the dialog
+            });
 
-                passwordResetDialog.create().show();
-
-            }
+            passwordResetDialog.create().show();
         });
     }
 
-    public Task<String> getEmailByUsername(String username) {
-        TaskCompletionSource<String> taskCompletionSource = new TaskCompletionSource<>();
+    public Task<User> getUserDetailsByUsername(String username) {
+        TaskCompletionSource<User> taskCompletionSource = new TaskCompletionSource<>();
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -159,8 +138,11 @@ public class login extends AppCompatActivity {
                     if (username.equals(name)) {
                         String email = childSnapshot.child("Email").getValue(String.class);
                         String id = childSnapshot.getKey();
-                        if (email != null) {
-                            taskCompletionSource.setResult(email);
+                        String password = childSnapshot.child("Password").getValue(String.class);
+                        String sdt = childSnapshot.child("Sodienthoai").getValue(String.class);
+
+                        if (email != null && id != null && password != null && sdt != null) {
+                            taskCompletionSource.setResult(new User(id, email, password, name, sdt));
                             found = true;
                             break;
                         }
