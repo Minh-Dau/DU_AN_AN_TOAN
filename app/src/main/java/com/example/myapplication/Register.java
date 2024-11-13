@@ -11,11 +11,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class Register extends AppCompatActivity {
     EditText name,email,sodienthoai,pass1,pass2;
@@ -49,6 +52,8 @@ public class Register extends AppCompatActivity {
                 String pass1_text=pass1.getText().toString();
                 String pass2_text=pass2.getText().toString();
                 String sodienthoai_text=sodienthoai.getText().toString();
+
+
                 if(name_text.isEmpty()||email_text.isEmpty()||pass1_text.isEmpty()||pass2_text.isEmpty()){
                     Toast.makeText(Register.this,"Dien Thong Tin",Toast.LENGTH_SHORT).show();
                 }
@@ -56,31 +61,37 @@ public class Register extends AppCompatActivity {
                     Toast.makeText(Register.this,"Mat Khau Khong Trung",Toast.LENGTH_SHORT).show();
                 }
                 else{
+                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
-                    databaseReference.child("user").addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.hasChild(name_text)){
-                                Toast.makeText(Register.this,"Ten da dang ky",Toast.LENGTH_SHORT).show();
-                            }
-                            else{
-                                databaseReference.child("users").child(name_text).child("Name").setValue(name_text);
-                                databaseReference.child("users").child(name_text).child("Email").setValue(email_text);
-                                databaseReference.child("users").child(name_text).child("Password").setValue(pass1_text);
-                                databaseReference.child("users").child(name_text).child("Sodienthoai").setValue(sodienthoai_text);
-                                Toast.makeText(Register.this,"Đăng ký thành công",Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(Register.this, Register.class); // Restart the same activity
-                                startActivity(intent);
-                                finish(); // Close the current instance to prevent back navigation
+                    firebaseAuth.createUserWithEmailAndPassword(email_text, pass1_text)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                            }
-                        }
+                                    // Gửi email xác thực
+                                    if (user != null) {
+                                        user.sendEmailVerification()
+                                                .addOnCompleteListener(verifyTask -> {
+                                                    // Email xác thực đã được gửi
+                                                    Toast.makeText(Register.this, "Email xác thực đã được gửi, vui lòng kiểm tra email của bạn", Toast.LENGTH_LONG).show();
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
+                                                    // Chuyển đến màn hình xác nhận email
+                                                    Intent intent = new Intent(Register.this, verify_email.class);
+                                                    intent.putExtra("userID", user.getUid());  // Chuyển ID người dùng để kiểm tra xác thực sau này
+                                                    intent.putExtra("name_text", name_text);
+                                                    intent.putExtra("email_text", email_text);
+                                                    intent.putExtra("pass1_text", pass1_text);
+                                                    intent.putExtra("sodienthoai_text", sodienthoai_text);
+                                                    startActivity(intent);
+                                                    finish();  // Đóng màn hình đăng ký sau khi chuyển
+                                                }).addOnFailureListener(e -> {
+                                                    Toast.makeText(Register.this, "Không thể gửi email xác thực: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
+                                    }
+                                } else {
+                                    Toast.makeText(Register.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
 
                 }
             }
