@@ -66,7 +66,7 @@
         <!-- Login button -->
         <Button
             android:id="@+id/btn_dangnhap"
-            android:layout_width="match_parent"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:text="ĐĂNG NHẬP"
             android:backgroundTint="#000000"
@@ -79,21 +79,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Quên mật khẩu?"
-            android:textColorLink="#0000FF"
+            android:textColor="#0000FF"
             android:textStyle="bold"
+            android:textDecoration="underline"
             android:layout_gravity="center_horizontal"
             android:paddingTop="5dp" />
 
         <!-- "Register" link -->
-        <TextView
-            android:id="@+id/edit_dangky"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bạn chưa có tài khoản? Đăng ký"
-            android:textColorLink="#0000FF"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp" />
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bạn chưa có tài khoản? "
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp" />
+
+            <TextView
+                android:id="@+id/edit_dangky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng ký"
+                android:textDecoration="underline"
+                android:textColor="#0000FF"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp" />
+
+        </LinearLayout>
+
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

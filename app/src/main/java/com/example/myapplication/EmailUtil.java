@@ -2,6 +2,8 @@ package com.example.myapplication;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
 public class EmailUtil {
@@ -25,7 +27,7 @@ public class EmailUtil {
 
         try {
             MimeMessage message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(senderEmail));
+            message.setFrom(new InternetAddress(senderEmail, "ADMIN"));
             message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientEmail));
             message.setSubject("Your OTP Code");
             message.setText("Your OTP code is: " + otp);
@@ -34,6 +36,8 @@ public class EmailUtil {
             System.out.println("OTP sent successfully!");
         } catch (MessagingException e) {
             e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
     }
 }

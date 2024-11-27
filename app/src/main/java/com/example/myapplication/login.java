@@ -7,9 +7,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +31,7 @@ public class login extends AppCompatActivity {
     Button nhan_dangnhap;
     EditText name,passsword;
     TextView nhan_dangky, nhan_quenmk;
+    ImageView img_show1;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
 
     FirebaseAuth fAuth;
@@ -41,7 +45,22 @@ public class login extends AppCompatActivity {
         passsword=findViewById(R.id.etPassword);
         nhan_dangky=findViewById(R.id.edit_dangky);
         nhan_quenmk=findViewById(R.id.edit_quenmk);
+        img_show1=findViewById(R.id.img_show1);
         fAuth = FirebaseAuth.getInstance();
+
+        img_show1.setOnClickListener(v -> {
+            if (passsword.getTransformationMethod() instanceof PasswordTransformationMethod) {
+                // Hiện mật khẩu
+                passsword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                img_show1.setImageResource(R.drawable.eye_open);
+            } else {
+                // Ẩn mật khẩu
+                passsword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                img_show1.setImageResource(R.drawable.eye_close);
+            }
+            // Đặt lại con trỏ về cuối chuỗi
+            passsword.setSelection(passsword.getText().length());
+        });
 
         nhan_dangky.setOnClickListener(new View.OnClickListener() {
             @Override
