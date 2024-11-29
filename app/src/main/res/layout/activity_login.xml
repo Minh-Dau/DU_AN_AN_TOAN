@@ -36,10 +36,9 @@
             android:id="@+id/edit_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:hint="Tên tài khoản"
             android:inputType="textPersonName"
-            android:minHeight="48dp" />
+            android:layout_marginBottom="16dp" />
 
         <!-- Password input field with show/hide password functionality -->
         <LinearLayout
@@ -55,78 +54,36 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Mật khẩu"
-                android:inputType="textPassword"
-                tools:ignore="TouchTargetSizeCheck" />
+                android:inputType="textPassword" />
 
-            <ImageView
-                android:id="@+id/img_show1"
-                android:layout_width="30dp"
-                android:layout_height="27dp"
-                android:src="@drawable/eye_close" />
         </LinearLayout>
 
         <!-- Login button -->
-        <FrameLayout
+        <Button
+            android:id="@+id/btn_dangnhap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            >
-            <Button
-                android:id="@+id/btn_dangnhap"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="25dp"
-                android:backgroundTint="#000000"
-                android:text="ĐĂNG NHẬP"
-                android:layout_gravity="center"
-                android:textColor="@android:color/white"
-                />
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                />
-        </FrameLayout>
-
-
-        <TextView
-            android:id="@+id/edit_quenmk"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Quên mật khẩu?"
-            android:textColor="#0000FF"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp" />
+            android:text="ĐĂNG NHẬP"
+            android:backgroundTint="#000000"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="10dp"/>
 
         <!-- "Register" link -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/edit_dangky"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_gravity="center"
-            >
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bạn chưa có tài khoản? "
-                android:layout_gravity="center_horizontal"
-                android:paddingTop="5dp" />
-
-            <TextView
-                android:id="@+id/edit_dangky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đăng ký"
-                android:textColor="#0000FF"
-                android:textStyle="bold"
-                android:layout_gravity="center_horizontal"
-                android:paddingTop="5dp" />
-
-        </LinearLayout>
-
+            android:text="Bạn chưa có tài khoản? Đăng ký"
+            android:textColor="#1b8a52"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal" />
+        <TextView
+            android:id="@+id/edit_quenmatkhau"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quên mật khẩu"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
