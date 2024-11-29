@@ -34,7 +34,7 @@ public class verify_otp2 extends AppCompatActivity {
         setContentView(R.layout.activity_verify_otp2);
 
         TextView textEmail = findViewById(R.id.textEmail);
-        textEmail.setText(getIntent().getStringExtra("mobile"));
+        textEmail.setText("Enter the OTP send to" + getIntent().getStringExtra("email"));
 
         inputCode1 =findViewById(R.id.inputCode1);
         inputCode2 =findViewById(R.id.inputCode2);
@@ -74,7 +74,7 @@ public class verify_otp2 extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 if (code.equals(otp)) {
                     Toast.makeText(verify_otp2.this, "OTP verified successfully!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    Intent intent = new Intent(getApplicationContext(), show.class);
                     intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                 } else { // nhập không đúng

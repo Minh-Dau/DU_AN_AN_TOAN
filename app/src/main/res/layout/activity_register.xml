@@ -107,15 +107,31 @@
             android:text="Đăng ký ngay"
             android:backgroundTint="#000000"
             android:textColor="@android:color/white"/>
-        <TextView
-            android:id="@+id/edit_dangnhap"
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đã có tài khoản? Đăng nhập"
-            android:textColorLink="#0000FF"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal"
-            android:paddingTop="5dp" />
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bạn chưa có tài khoản? "
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp" />
+
+            <TextView
+                android:id="@+id/edit_dangnhap"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng nhập"
+                android:textColor="#0000FF"
+                android:textStyle="bold"
+                android:layout_gravity="center_horizontal"
+                android:paddingTop="5dp" />
+
+        </LinearLayout>
 
 
 

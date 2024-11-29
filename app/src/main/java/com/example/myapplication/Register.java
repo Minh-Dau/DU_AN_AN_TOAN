@@ -83,7 +83,7 @@ public class Register extends AppCompatActivity {
                                                     intent.putExtra("pass1_text", pass1_text);
                                                     intent.putExtra("sodienthoai_text", sodienthoai_text);
                                                     startActivity(intent);
-                                                    finish();  // Đóng màn hình đăng ký sau khi chuyển
+                                                    finish();
                                                 }).addOnFailureListener(e -> {
                                                     Toast.makeText(Register.this, "Không thể gửi email xác thực: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 });

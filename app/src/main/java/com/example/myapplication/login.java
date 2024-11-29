@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,9 +31,11 @@ import com.google.firebase.database.ValueEventListener;
 
 public class login extends AppCompatActivity {
     Button nhan_dangnhap;
+    ProgressBar progressBar;
     EditText name,passsword;
     TextView nhan_dangky, nhan_quenmk;
     ImageView img_show1;
+    String id,email,username,password,sdt;
     DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
 
     FirebaseAuth fAuth;
@@ -41,6 +45,7 @@ public class login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         nhan_dangnhap=findViewById(R.id.btn_dangnhap);
+        progressBar = findViewById(R.id.progressBar);
         name=findViewById(R.id.edit_name);
         passsword=findViewById(R.id.etPassword);
         nhan_dangky=findViewById(R.id.edit_dangky);
@@ -83,19 +88,22 @@ public class login extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if(snapshot.hasChild(name_text)){
-                                String getpassword=snapshot.child(name_text).child("Password").getValue(String.class);
+                                String getpassword = snapshot.child(name_text).child("Password").getValue(String.class);
+                                String getEmail = snapshot.child(name_text).child("Email").getValue(String.class);
                                 if(getpassword.equals(password_text)){
-                                    Toast.makeText(login.this,"Dang nhap thanh cong",Toast.LENGTH_SHORT).show();
-                                    Intent intent =new Intent(getApplicationContext(),send_otp2.class);
-                                    startActivity(intent);
-                                    finish();
+                                    getUserDetailsByUsername(name_text);
+                                    verifyLogin(getEmail);
+//                                    Intent intent = new Intent(login.this,verify_otp2.class);
+//                                    intent.putExtra("email", getEmail);
+//                                    startActivity(intent);
+//                                    finish();
                                 }
                                 else{
-                                    Toast.makeText(login.this,"Dang nhap that bai",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(login.this,"Hãy kiểm tra lại mật khẩu.",Toast.LENGTH_SHORT).show();
                                 }
                             }
                             else {
-                                Toast.makeText(login.this,"Dang nhap that bai",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(login.this,"Không tồn tại user.",Toast.LENGTH_SHORT).show();
                             }
                         }
 
@@ -146,7 +154,7 @@ public class login extends AppCompatActivity {
         });
     }
 
-    public Task<User> getUserDetailsByUsername(String username) {
+        public Task<User> getUserDetailsByUsername(String username) {
         TaskCompletionSource<User> taskCompletionSource = new TaskCompletionSource<>();
         databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -155,11 +163,10 @@ public class login extends AppCompatActivity {
                 for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                     String name = childSnapshot.child("Name").getValue(String.class);
                     if (username.equals(name)) {
-                        String email = childSnapshot.child("Email").getValue(String.class);
-                        String id = childSnapshot.getKey();
-                        String password = childSnapshot.child("Password").getValue(String.class);
-                        String sdt = childSnapshot.child("Sodienthoai").getValue(String.class);
-
+                        email = childSnapshot.child("Email").getValue(String.class);
+                        id = childSnapshot.getKey();
+                        password = childSnapshot.child("Password").getValue(String.class);
+                        sdt = childSnapshot.child("Sodienthoai").getValue(String.class);
                         if (email != null && id != null && password != null && sdt != null) {
                             taskCompletionSource.setResult(new User(id, email, password, name, sdt));
                             found = true;
@@ -178,6 +185,68 @@ public class login extends AppCompatActivity {
             }
         });
         return taskCompletionSource.getTask();
+    }
+
+
+    // Tạo mã OTP 6 chữ số
+    public static String generateOTP() {
+        int otp = (int) (Math.random() * 900000) + 100000; // Mã OTP 6 chữ số
+        return String.valueOf(otp);
+    }
+
+    // AsyncTask để gửi OTP trong background
+    private static class SendOTPAsyncTask extends AsyncTask<Void, Void, Void> {
+        private String email;
+        private String otp;
+        private Button nhan_dangnhap;
+        private ProgressBar progressBar;
+
+
+        SendOTPAsyncTask(String email, String otp, ProgressBar progressBar, Button nhan_dangnhap) {
+            this.email = email;
+            this.otp = otp;
+            this.progressBar = progressBar;
+            this.nhan_dangnhap = nhan_dangnhap;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Gửi OTP email
+            EmailUtil.sendOTPEmail(email, otp);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            progressBar.setVisibility(View.GONE);
+            nhan_dangnhap.setVisibility(View.VISIBLE);
+
+            // Hiển thị thông báo gửi OTP thành công
+            Toast.makeText(nhan_dangnhap.getContext(), "OTP sent to " + email, Toast.LENGTH_SHORT).show();
+
+            // Chuyển đến màn hình xác thực OTP
+            Intent intent = new Intent(nhan_dangnhap.getContext(), verify_otp2.class);
+            intent.putExtra("email", email);
+            intent.putExtra("verificationId", otp);
+            nhan_dangnhap.getContext().startActivity(intent);
+        }
+    }
+
+
+    public void verifyLogin(String emailInput){
+        String email = emailInput.trim();
+
+        String otp = generateOTP(); // Tạo mã OTP
+
+        nhan_dangnhap.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+
+
+
+        // Chạy AsyncTask để gửi OTP
+        new SendOTPAsyncTask(email, otp, progressBar, nhan_dangnhap).execute();
     }
 
 
