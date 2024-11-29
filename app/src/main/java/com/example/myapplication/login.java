@@ -84,27 +84,59 @@ public class login extends AppCompatActivity {
                     Toast.makeText(login.this,"Dien Thong Tin",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    databaseReference.child("users").addListenerForSingleValueEvent(new ValueEventListener() {
+                    databaseReference.child("users").orderByChild("Name").equalTo(name_text).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if(snapshot.hasChild(name_text)){
-                                String getpassword = snapshot.child(name_text).child("Password").getValue(String.class);
-                                String getEmail = snapshot.child(name_text).child("Email").getValue(String.class);
-                                if(getpassword.equals(password_text)){
-                                    getUserDetailsByUsername(name_text);
-                                    verifyLogin(getEmail);
-//                                    Intent intent = new Intent(login.this,verify_otp2.class);
-//                                    intent.putExtra("email", getEmail);
-//                                    startActivity(intent);
-//                                    finish();
+                            if (snapshot.exists()) {
+                                // Loop through all users with the same name (if any) and check the password
+                                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                    String getPassword = userSnapshot.child("Password").getValue(String.class);
+                                    if (getPassword != null && getPassword.equals(password_text)) {
+                                        Toast.makeText(login.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+
+                                        // Retrieve user details
+                                        String id = userSnapshot.child("ID").getValue(String.class);
+                                        String email = userSnapshot.child("Email").getValue(String.class);
+                                        String phone = userSnapshot.child("Sodienthoai").getValue(String.class);
+                                        String pass = userSnapshot.child("Password").getValue(String.class);
+
+                                        // Pass user details to the next activity
+                                        verifyLogin(email);
+//                                        Intent intent = new Intent(getApplicationContext(), show.class);
+//                                        intent.putExtra("ID", id);
+//                                        intent.putExtra("name", name_text);
+//                                        intent.putExtra("email", email);
+//                                        intent.putExtra("Sodienthoai", phone);
+//                                        intent.putExtra("Password", pass);
+//                                        startActivity(intent);
+//                                        finish();
+//                                        return;
+                                    }
                                 }
-                                else{
-                                    Toast.makeText(login.this,"Hãy kiểm tra lại mật khẩu.",Toast.LENGTH_SHORT).show();
-                                }
+                                // If no password matches
+                                Toast.makeText(login.this, "Tên tài khoản hoặc mật khẩu sai!", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(login.this, "Tên tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
                             }
-                            else {
-                                Toast.makeText(login.this,"Không tồn tại user.",Toast.LENGTH_SHORT).show();
-                            }
+
+//                            if(snapshot.hasChild(name_text)){
+//                                String getpassword = snapshot.child(name_text).child("Password").getValue(String.class);
+//                                String getEmail = snapshot.child(name_text).child("Email").getValue(String.class);
+//                                if(getpassword.equals(password_text)){
+//                                    getUserDetailsByUsername(name_text);
+//                                    verifyLogin(getEmail);
+////                                    Intent intent = new Intent(login.this,verify_otp2.class);
+////                                    intent.putExtra("email", getEmail);
+////                                    startActivity(intent);
+////                                    finish();
+//                                }
+//                                else{
+//                                    Toast.makeText(login.this,"Hãy kiểm tra lại mật khẩu.",Toast.LENGTH_SHORT).show();
+//                                }
+//                            }
+//                            else {
+//                                Toast.makeText(login.this,"Không tồn tại user.",Toast.LENGTH_SHORT).show();
+//                            }
                         }
 
                         @Override
