@@ -4,10 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +26,9 @@ public class login extends AppCompatActivity {
     Button nhan_dangnhap;
     EditText name, password;
     TextView nhan_dangky, quenmatkhau;
+    ProgressBar progressBar;
+    ImageView img_show1;
+    static String id,email,phone,pass,username;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
 
     @Override
@@ -29,10 +37,25 @@ public class login extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         nhan_dangnhap = findViewById(R.id.btn_dangnhap);
+        progressBar = findViewById(R.id.progressBar);
         name = findViewById(R.id.edit_name);
+        img_show1=findViewById(R.id.img_show1);
         password = findViewById(R.id.etPassword);
         nhan_dangky = findViewById(R.id.edit_dangky);
-        quenmatkhau = findViewById(R.id.edit_quenmatkhau);
+        quenmatkhau = findViewById(R.id.edit_quenmk);
+
+
+        img_show1.setOnClickListener(v -> {
+                    if (password.getTransformationMethod() instanceof PasswordTransformationMethod) {
+                        // Hiện mật khẩu
+                        password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                        img_show1.setImageResource(R.drawable.eye_open);
+                    } else {
+                        // Ẩn mật khẩu
+                        password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                        img_show1.setImageResource(R.drawable.eye_close);
+                    }
+                });
 
         quenmatkhau.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,21 +94,15 @@ public class login extends AppCompatActivity {
                                         Toast.makeText(login.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
 
                                         // Retrieve user details
-                                        String id = userSnapshot.child("ID").getValue(String.class);
-                                        String email = userSnapshot.child("Email").getValue(String.class);
-                                        String phone = userSnapshot.child("Sodienthoai").getValue(String.class);
-                                        String pass = userSnapshot.child("Password").getValue(String.class);
+                                         id = userSnapshot.child("ID").getValue(String.class);
+                                         username = userSnapshot.child("Name").getValue(String.class);
+                                         email = userSnapshot.child("Email").getValue(String.class);
+                                         phone = userSnapshot.child("Sodienthoai").getValue(String.class);
+                                         pass = userSnapshot.child("Password").getValue(String.class);
+
 
                                         verifyLogin(email);
-                                        Intent intent = new Intent(getApplicationContext(), show.class);
-                                        intent.putExtra("ID", id);
-                                        intent.putExtra("name", name_text);
-                                        intent.putExtra("email", email);
-                                        intent.putExtra("Sodienthoai", phone);
-                                        intent.putExtra("Password", pass);
-                                        startActivity(intent);
-                                        finish();
-                                        return;
+
                                     }
                                 }
                                 // If no password matches
@@ -104,66 +121,72 @@ public class login extends AppCompatActivity {
             }
         });
 
-        // Tạo mã OTP 6 chữ số
-        public static String generateOTP() {
-            int otp = (int) (Math.random() * 900000) + 100000; // Mã OTP 6 chữ số
-            return String.valueOf(otp);
-        }
-
-        // AsyncTask để gửi OTP trong background
-        private static class SendOTPAsyncTask extends AsyncTask<Void, Void, Void> {
-            private String email;
-            private String otp;
-            private Button nhan_dangnhap;
-            private ProgressBar progressBar;
-
-
-            SendOTPAsyncTask(String email, String otp, ProgressBar progressBar, Button nhan_dangnhap) {
-                this.email = email;
-                this.otp = otp;
-                this.progressBar = progressBar;
-                this.nhan_dangnhap = nhan_dangnhap;
-            }
-
-            @Override
-            protected Void doInBackground(Void... voids) {
-                // Gửi OTP email
-                EmailUtil.sendOTPEmail(email, otp);
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
-
-                progressBar.setVisibility(View.GONE);
-                nhan_dangnhap.setVisibility(View.VISIBLE);
-
-                // Hiển thị thông báo gửi OTP thành công
-                Toast.makeText(nhan_dangnhap.getContext(), "OTP sent to " + email, Toast.LENGTH_SHORT).show();
-
-                // Chuyển đến màn hình xác thực OTP
-                Intent intent = new Intent(nhan_dangnhap.getContext(), verify_otp2.class);
-                intent.putExtra("email", email);
-                intent.putExtra("verificationId", otp);
-                nhan_dangnhap.getContext().startActivity(intent);
-            }
-        }
-
-
-        public void verifyLogin(String emailInput){
-            String email = emailInput.trim();
-
-            String otp = generateOTP(); // Tạo mã OTP
-
-            nhan_dangnhap.setVisibility(View.INVISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-
-
-
-            // Chạy AsyncTask để gửi OTP
-            new SendOTPAsyncTask(email, otp, progressBar, nhan_dangnhap).execute();
-        }
-
     }
+
+    // Tạo mã OTP 6 chữ số
+    public static String generateOTP() {
+        int otp = (int) (Math.random() * 900000) + 100000; // Mã OTP 6 chữ số
+        return String.valueOf(otp);
+    }
+
+    // AsyncTask để gửi OTP trong background
+    private static class SendOTPAsyncTask extends AsyncTask<Void, Void, Void> {
+        private String email;
+        private String otp;
+        private Button nhan_dangnhap;
+        private ProgressBar progressBar;
+
+
+        SendOTPAsyncTask(String email, String otp, ProgressBar progressBar, Button nhan_dangnhap) {
+            this.email = email;
+            this.otp = otp;
+            this.progressBar = progressBar;
+            this.nhan_dangnhap = nhan_dangnhap;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            // Gửi OTP email
+            EmailUtil.sendOTPEmail(email, otp);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
+            progressBar.setVisibility(View.GONE);
+            nhan_dangnhap.setVisibility(View.VISIBLE);
+
+            // Hiển thị thông báo gửi OTP thành công
+            Toast.makeText(nhan_dangnhap.getContext(), "OTP sent to " + email, Toast.LENGTH_SHORT).show();
+
+            // Chuyển đến màn hình xác thực OTP
+            Intent intent = new Intent(nhan_dangnhap.getContext(), verify_otp2.class);
+            intent.putExtra("ID", id);
+            intent.putExtra("name", username);
+            intent.putExtra("Sodienthoai", phone);
+            intent.putExtra("Password", pass);
+            intent.putExtra("email", email);
+            intent.putExtra("verificationId", otp);
+            nhan_dangnhap.getContext().startActivity(intent);
+
+        }
+    }
+
+
+    public void verifyLogin(String emailInput){
+        String email = emailInput.trim();
+
+        String otp = generateOTP(); // Tạo mã OTP
+
+        nhan_dangnhap.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+
+
+
+        // Chạy AsyncTask để gửi OTP
+        new SendOTPAsyncTask(email, otp, progressBar, nhan_dangnhap).execute();
+    }
+
 }

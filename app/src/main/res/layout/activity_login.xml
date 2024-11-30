@@ -56,6 +56,12 @@
                 android:hint="Mật khẩu"
                 android:inputType="textPassword" />
 
+            <ImageView
+                android:id="@+id/img_show1"
+                android:layout_width="30dp"
+                android:layout_height="27dp"
+                android:src="@drawable/eye_close" />
+
         </LinearLayout>
 
         <!-- Login button -->
