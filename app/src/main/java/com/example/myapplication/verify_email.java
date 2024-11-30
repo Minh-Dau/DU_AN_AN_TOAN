@@ -23,6 +23,7 @@ public class verify_email extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private String userID, name_text, email_text, pass1_text, sodienthoai_text;
+
     private Button btnDangKy;
     private TextView textEmail;
 
@@ -61,6 +62,7 @@ public class verify_email extends AppCompatActivity {
                 finish();
             }
         });
+
 
     }
 
