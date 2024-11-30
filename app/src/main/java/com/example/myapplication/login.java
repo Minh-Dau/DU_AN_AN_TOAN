@@ -100,7 +100,6 @@ public class login extends AppCompatActivity {
                                          phone = userSnapshot.child("Sodienthoai").getValue(String.class);
                                          pass = userSnapshot.child("Password").getValue(String.class);
 
-
                                         verifyLogin(email);
 
                                     }
@@ -163,7 +162,7 @@ public class login extends AppCompatActivity {
             nhan_dangnhap.setVisibility(View.VISIBLE);
 
             // Hiển thị thông báo gửi OTP thành công
-            Toast.makeText(nhan_dangnhap.getContext(), "OTP sent to " + email, Toast.LENGTH_SHORT).show();
+            Toast.makeText(nhan_dangnhap.getContext(), "OTP đã được gửi đến email: " + email, Toast.LENGTH_SHORT).show();
 
             // Chuyển đến màn hình xác thực OTP
             Intent intent = new Intent(nhan_dangnhap.getContext(), verify_otp2.class);
@@ -178,7 +177,6 @@ public class login extends AppCompatActivity {
         }
     }
 
-
     public void verifyLogin(String emailInput){
         String email = emailInput.trim();
 
@@ -186,8 +184,6 @@ public class login extends AppCompatActivity {
 
         nhan_dangnhap.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-
-
 
         // Chạy AsyncTask để gửi OTP
         new SendOTPAsyncTask(email, otp, progressBar, nhan_dangnhap).execute();

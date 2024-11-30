@@ -52,7 +52,7 @@ public class update_pass extends AppCompatActivity {
                 return;
             }
             if (!password1.matches(passwordPattern)) {
-                Toast.makeText(update_pass.this, "Mật khẩu phải chứa ít nhất 1 chữ in hoa, 1 số và 1 ký tự đặc biệt, và dài tối thiểu 8 ký tự", Toast.LENGTH_SHORT).show();
+                Toast.makeText(update_pass.this, "Mật khẩu phải tối thiểu 8 ký tự, chứa ít nhất 1 chữ in hoa, 1 số và 1 ký tự đặc biệt (@,$,!,%,*,?,&)", Toast.LENGTH_SHORT).show();
                 return;
             }
 

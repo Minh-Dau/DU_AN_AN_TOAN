@@ -31,18 +31,27 @@
             android:gravity="center"
             android:textSize="30dp"
             android:textStyle="bold"
-            android:text="Verify Your Email"
+            android:text="Xác thực Email"
             android:textColor="#000000"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Mã xác nhận đã được gửi qua email"
             />
 
         <TextView
             android:id="@+id/textEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:text="huyphan7897@gmail.com"
             android:gravity="center"
-            android:text="The confirmation mail has been sent to your email"
-            android:textColor="#666666"
+            android:textColor="#ff0000"
+            android:paddingTop="5dp"
+            android:textSize="20dp"
             />
 
         <TextView
@@ -50,13 +59,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="Please access your email\nand click the confirmation link"
-            android:textColor="#666666"
+            android:text="Truy cập vào email\nvà bấm vào link xác nhận"
+            android:textSize="16dp"
             />
 
         <!-- OTP Input Fields -->
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="30dp"
@@ -64,21 +73,11 @@
             android:layout_marginBottom="30dp">
 
             <Button
-                android:id="@+id/edit_dangkylai"
+                android:id="@+id/btnDangKy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Đăng ký lại"
-
                 />
-
-            <Button
-                android:id="@+id/btnResend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Resend"
-                android:textSize="16sp"
-                android:backgroundTint="#4CAF50"
-                android:textColor="@android:color/white"/>
 
             <ProgressBar
                 android:id="@+id/progressBar"

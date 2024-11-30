@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class EmailUtil {
 
-    public static void sendOTPEmail(String recipientEmail, String otp) {
+    public static boolean sendOTPEmail(String recipientEmail, String otp) {
         String senderEmail = "testlaravel441@gmail.com"; // Địa chỉ email gửi
         String senderPassword = "svqcyepzqukktpgg"; // Mật khẩu email gửi
 
@@ -33,11 +33,12 @@ public class EmailUtil {
             message.setText("Your OTP code is: " + otp);
 
             Transport.send(message);
-            System.out.println("OTP sent successfully!");
+            return true;
         } catch (MessagingException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+        return false;
     }
 }
