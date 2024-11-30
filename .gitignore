@@ -1,16 +1,73 @@
-*.iml
-.gradle
-.idea/
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle-wrapper.jar
+
+# Local configuration file
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+
+# Log files
+*.log
+
+# Android Studio specific
+.idea/
+*.iml
+*.hprof
+
+# Generated files
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+*.apk
+*.ap_
+*.keystore
+*.jks
+*.class
+
+# IntelliJ IDEA specific
+*.idea/misc.xml
+*.idea/modules.xml
+*.idea/workspace.xml
+*.idea/navEditor.xml
+*.idea/assetWizardSettings.xml
+
+# User-specific files
+.idea/libraries/
+.idea/caches/
+.idea/httpRequests/
+.idea/codeStyles/
+.idea/runConfigurations/
+
+# Proguard
+proguard/
+proguard-rules.pro
+
+# Lint
+lint/intermediates/
+lint/generated/
+
+# NDK
+obj/
+
+# Dependency cache
+**/.gradle/
+**/build/
+
+# Captures folder
+captures/
+
+# External native build folder generated in Android Studio 2.2+
+.externalNativeBuild/
+
+# Jetpack Compose (if used)
+.compose/
+
+# Firebase
+firebase-debug.log
+
+# Android crashlytics
+crashlytics.properties
+crashlytics-build.properties
+
+# Misc
+*.swp
+*.swo

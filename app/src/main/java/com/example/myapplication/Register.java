@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,54 +70,38 @@ public class Register extends AppCompatActivity {
                 } else if (!pass1_text.matches(passwordPattern)) {
                     Toast.makeText(Register.this, "Mật khẩu phải chứa ít nhất 1 chữ in hoa, 1 số và 1 ký tự đặc biệt", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Get the current last ID used from Firebase
-                    DatabaseReference idRef = databaseReference.child("lastUserId");
-                    idRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            int lastUserId = snapshot.exists() ? snapshot.getValue(Integer.class) : 0;
-                            int newUserId = lastUserId + 1; // Increment ID
-                            String newUserIdStr = String.format("%05d", newUserId); // Format as 5 digits
 
-                            // Create a new user entry with the generated ID
-                            DatabaseReference usersRef = databaseReference.child("users");
-                            usersRef.orderByChild("Email").equalTo(email_text).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    if (snapshot.exists()) {
-                                        Toast.makeText(Register.this, "Email đã đăng ký", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        // Set user data along with the generated ID (No ID input from user)
-                                        usersRef.child(newUserIdStr).child("ID").setValue(newUserIdStr); // Store the generated ID
-                                        usersRef.child(newUserIdStr).child("Name").setValue(name_text);
-                                        usersRef.child(newUserIdStr).child("Email").setValue(email_text);
-                                        usersRef.child(newUserIdStr).child("Password").setValue(pass1_text);
-                                        usersRef.child(newUserIdStr).child("Sodienthoai").setValue(sodienthoai_text);
+                    FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 
-                                        // Update the lastUserId to the new ID
-                                        idRef.setValue(newUserId);
+                    firebaseAuth.createUserWithEmailAndPassword(email_text,pass1_text).addOnCompleteListener(
+                            task -> {
+                                if (task.isSuccessful()) {
+                                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                                    // Gửi email xác thực
+                                    if (user != null) {
+                                        user.sendEmailVerification()
+                                                .addOnCompleteListener(verifyTask -> {
+                                                    // Email xác thực đã được gửi
+                                                    Toast.makeText(Register.this, "Email xác thực đã được gửi, vui lòng kiểm tra email của bạn", Toast.LENGTH_LONG).show();
 
-                                        Toast.makeText(Register.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
-
-                                        // Navigate to login page
-                                        Intent intent = new Intent(Register.this, login.class);
-                                        startActivity(intent);
-                                        finish(); // Close the current activity
+                                                    // Chuyển đến màn hình xác nhận email
+                                                    Intent intent = new Intent(Register.this, verify_email.class);
+//                                                    intent.putExtra("userID", user.getUid());  // Chuyển ID người dùng để kiểm tra xác thực sau này
+                                                    intent.putExtra("name_text", name_text);
+                                                    intent.putExtra("email_text", email_text);
+                                                    intent.putExtra("pass1_text", pass1_text);
+                                                    intent.putExtra("sodienthoai_text", sodienthoai_text);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }).addOnFailureListener(e -> {
+                                                    Toast.makeText(Register.this, "Không thể gửi email xác thực: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                });
                                     }
                                 }
+                            }
+                    );
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-                                    Toast.makeText(Register.this, "Lỗi kết nối cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                            Toast.makeText(Register.this, "Lỗi kết nối cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
-                        }
-                    });
                 }
             }
         });

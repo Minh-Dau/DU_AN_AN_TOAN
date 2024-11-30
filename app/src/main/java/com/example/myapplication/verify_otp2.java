@@ -34,7 +34,7 @@ public class verify_otp2 extends AppCompatActivity {
         setContentView(R.layout.activity_verify_otp2);
 
         TextView textEmail = findViewById(R.id.textEmail);
-        textEmail.setText("Enter the OTP send to" + getIntent().getStringExtra("email"));
+        textEmail.setText("Enter the OTP send to " + getIntent().getStringExtra("email"));
 
         inputCode1 =findViewById(R.id.inputCode1);
         inputCode2 =findViewById(R.id.inputCode2);
@@ -49,6 +49,13 @@ public class verify_otp2 extends AppCompatActivity {
         final Button btnVerify = findViewById(R.id.btnVerifyOTP);
 
         otp = getIntent().getStringExtra("verificationId");
+
+        Intent intent = getIntent();
+        String userID= intent.getStringExtra("ID");
+        String userName = intent.getStringExtra("name");
+        String userEmail = intent.getStringExtra("email");
+        String userPhone = intent.getStringExtra("Sodienthoai");
+        String userPass = intent.getStringExtra("Password");
 
         btnVerify.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,8 +82,14 @@ public class verify_otp2 extends AppCompatActivity {
                 if (code.equals(otp)) {
                     Toast.makeText(verify_otp2.this, "OTP verified successfully!", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(getApplicationContext(), show.class);
+                    intent.putExtra("ID", userID);
+                    intent.putExtra("name", userName);
+                    intent.putExtra("email", userEmail);
+                    intent.putExtra("Sodienthoai", userPhone);
+                    intent.putExtra("Password", userPass);
                     intent.setFlags(intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
+                    finish();
                 } else { // nhập không đúng
                     Toast.makeText(verify_otp2.this, "Invalid OTP. Please try again.", Toast.LENGTH_SHORT).show();
                 }

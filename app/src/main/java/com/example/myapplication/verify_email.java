@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -9,8 +10,11 @@ import android.os.Handler;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class verify_email extends AppCompatActivity {
 
@@ -32,7 +36,7 @@ public class verify_email extends AppCompatActivity {
 
 
         firebaseAuth = FirebaseAuth.getInstance();
-        userID = getIntent().getStringExtra("userID");
+//        userID = getIntent().getStringExtra("userID");
         name_text = getIntent().getStringExtra("name_text");
         email_text = getIntent().getStringExtra("email_text");
         pass1_text = getIntent().getStringExtra("pass1_text");
@@ -40,8 +44,6 @@ public class verify_email extends AppCompatActivity {
 
         startTime = System.currentTimeMillis();
         startEmailVerificationCheck();
-
-
 
     }
 
@@ -62,16 +64,54 @@ public class verify_email extends AppCompatActivity {
                     user.reload().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             if (user.isEmailVerified()) {
-                                // Lưu thông tin người dùng vào Firebase Database
-                                databaseReference.child("users").child(user.getUid()).child("Name").setValue(name_text);
-                                databaseReference.child("users").child(user.getUid()).child("Email").setValue(email_text);
-                                databaseReference.child("users").child(user.getUid()).child("Password").setValue(pass1_text);
-                                databaseReference.child("users").child(user.getUid()).child("Sodienthoai").setValue(sodienthoai_text);
+                                DatabaseReference idRef = databaseReference.child("lastUserId");
+                                idRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        int lastUserId = snapshot.exists() ? snapshot.getValue(Integer.class) : 0;
+                                        int newUserId = lastUserId + 1; // Increment ID
+                                        String newUserIdStr = String.format("%05d", newUserId); // Format as 5 digits
 
-                                // Chuyển đến màn hình show
-                                Intent intent = new Intent(verify_email.this, show.class);
-                                startActivity(intent);
-                                finish();
+                                        // Create a new user entry with the generated ID
+                                        DatabaseReference usersRef = databaseReference.child("users");
+                                        usersRef.orderByChild("Email").equalTo(email_text).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if (snapshot.exists()) {
+                                                    Toast.makeText(verify_email.this, "Email đã đăng ký", Toast.LENGTH_SHORT).show();
+                                                } else {
+                                                    // Set user data along with the generated ID (No ID input from user)
+                                                    usersRef.child(newUserIdStr).child("ID").setValue(newUserIdStr); // Store the generated ID
+                                                    usersRef.child(newUserIdStr).child("Name").setValue(name_text);
+                                                    usersRef.child(newUserIdStr).child("Email").setValue(email_text);
+                                                    usersRef.child(newUserIdStr).child("Password").setValue(pass1_text);
+                                                    usersRef.child(newUserIdStr).child("Sodienthoai").setValue(sodienthoai_text);
+
+                                                    // Update the lastUserId to the new ID
+                                                    idRef.setValue(newUserId);
+
+                                                    Toast.makeText(verify_email.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+
+                                                    // Navigate to login page
+                                                    Intent intent = new Intent(verify_email.this, login.class);
+                                                    startActivity(intent);
+                                                    finish(); // Close the current activity
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(verify_email.this, "Lỗi kết nối cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Toast.makeText(verify_email.this, "Lỗi kết nối cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+
                             } else {
                                 // Nếu chưa xác thực, tiếp tục kiểm tra sau 2 giây
                                 handler.postDelayed(verificationCheckRunnable, 2000);
