@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 import android.os.Handler;
 
@@ -20,7 +22,7 @@ public class verify_email extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private String userID, name_text, email_text, pass1_text, sodienthoai_text;
-
+    private Button dangkylai;
     private DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
     private Handler handler = new Handler();
     private Runnable verificationCheckRunnable;
@@ -41,10 +43,17 @@ public class verify_email extends AppCompatActivity {
         email_text = getIntent().getStringExtra("email_text");
         pass1_text = getIntent().getStringExtra("pass1_text");
         sodienthoai_text = getIntent().getStringExtra("sodienthoai_text");
-
+        dangkylai=findViewById(R.id.edit_dangkylai);
         startTime = System.currentTimeMillis();
         startEmailVerificationCheck();
-
+        dangkylai.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent= new Intent(verify_email.this, Register.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
 
