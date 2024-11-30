@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,8 +48,6 @@ public class Register extends AppCompatActivity {
         nhan_dangnhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), login.class);
-                startActivity(intent);
                 finish();
             }
         });
@@ -89,6 +89,8 @@ public class Register extends AppCompatActivity {
 
                 if (name_text.isEmpty() || email_text.isEmpty() || pass1_text.isEmpty() || pass2_text.isEmpty()) {
                     Toast.makeText(Register.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                } else if (!isEmailValid(email_text)){
+                    Toast.makeText(Register.this, "Hãy nhập đúng định dạng Email", Toast.LENGTH_SHORT).show();
                 } else if (!pass1_text.equals(pass2_text)) {
                     Toast.makeText(Register.this, "Mật khẩu không trùng", Toast.LENGTH_SHORT).show();
                 } else if (!sodienthoai_text.matches(phonePattern)) {
@@ -96,7 +98,7 @@ public class Register extends AppCompatActivity {
                 } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email_text).matches()) {
                     Toast.makeText(Register.this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
                 } else if (!pass1_text.matches(passwordPattern)) {
-                    Toast.makeText(Register.this, "Mật khẩu phải chứa ít nhất 1 chữ in hoa, 1 số và 1 ký tự đặc biệt", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Register.this, "Mật khẩu phải tối thiểu 8 ký tự, chứa ít nhất 1 chữ in hoa, 1 số và 1 ký tự đặc biệt (@,$,!,%,*,?,&)", Toast.LENGTH_SHORT).show();
                 } else {
 
                     FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
@@ -108,22 +110,27 @@ public class Register extends AppCompatActivity {
                                     // Gửi email xác thực
                                     if (user != null) {
                                         user.sendEmailVerification()
-                                                .addOnCompleteListener(verifyTask -> {
+                                                .addOnCompleteListener(taskSend -> {
                                                     // Email xác thực đã được gửi
                                                     Toast.makeText(Register.this, "Email xác thực đã được gửi, vui lòng kiểm tra email của bạn", Toast.LENGTH_LONG).show();
 
                                                     // Chuyển đến màn hình xác nhận email
                                                     Intent intent = new Intent(Register.this, verify_email.class);
-//                                                    intent.putExtra("userID", user.getUid());  // Chuyển ID người dùng để kiểm tra xác thực sau này
                                                     intent.putExtra("name_text", name_text);
                                                     intent.putExtra("email_text", email_text);
                                                     intent.putExtra("pass1_text", pass1_text);
                                                     intent.putExtra("sodienthoai_text", sodienthoai_text);
                                                     startActivity(intent);
-                                                    finish();
                                                 }).addOnFailureListener(e -> {
                                                     Toast.makeText(Register.this, "Không thể gửi email xác thực: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                 });
+                                    }
+                                }
+                                else {
+                                    if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                                        Toast.makeText(Register.this, "Email đã tồn tại. Vui lòng đăng nhập.", Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(Register.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                     }
                                 }
                             }
@@ -132,4 +139,9 @@ public class Register extends AppCompatActivity {
             }
         });
     }
+
+    public boolean isEmailValid(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
 }

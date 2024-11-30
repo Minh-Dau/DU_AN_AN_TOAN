@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.os.Handler;
 
@@ -20,6 +23,8 @@ public class verify_email extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private String userID, name_text, email_text, pass1_text, sodienthoai_text;
+    private Button btnDangKy;
+    private TextView textEmail;
 
     private DatabaseReference databaseReference= FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
     private Handler handler = new Handler();
@@ -34,16 +39,28 @@ public class verify_email extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_email);
 
+        btnDangKy = findViewById(R.id.btnDangKy);
+        textEmail = findViewById(R.id.textEmail);
+
 
         firebaseAuth = FirebaseAuth.getInstance();
-//        userID = getIntent().getStringExtra("userID");
         name_text = getIntent().getStringExtra("name_text");
         email_text = getIntent().getStringExtra("email_text");
         pass1_text = getIntent().getStringExtra("pass1_text");
         sodienthoai_text = getIntent().getStringExtra("sodienthoai_text");
 
+        textEmail.setText(email_text);
+
         startTime = System.currentTimeMillis();
         startEmailVerificationCheck();
+
+        btnDangKy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                finish();
+            }
+        });
 
     }
 
@@ -56,6 +73,7 @@ public class verify_email extends AppCompatActivity {
                 if (currentTime - startTime >= TIME_LIMIT) {
                     // Nếu đã quá 5 phút, dừng kiểm tra và thông báo người dùng
                     Toast.makeText(verify_email.this, "Đã hết thời gian chờ xác thực email.", Toast.LENGTH_LONG).show();
+                    finish();
                     return;
                 }
 
@@ -69,10 +87,9 @@ public class verify_email extends AppCompatActivity {
                                     @Override
                                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                                         int lastUserId = snapshot.exists() ? snapshot.getValue(Integer.class) : 0;
-                                        int newUserId = lastUserId + 1; // Increment ID
-                                        String newUserIdStr = String.format("%05d", newUserId); // Format as 5 digits
+                                        int newUserId = lastUserId + 1;
+                                        String newUserIdStr = String.format("%05d", newUserId); // định dạng id thành 5 ký tự
 
-                                        // Create a new user entry with the generated ID
                                         DatabaseReference usersRef = databaseReference.child("users");
                                         usersRef.orderByChild("Email").equalTo(email_text).addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
@@ -80,22 +97,19 @@ public class verify_email extends AppCompatActivity {
                                                 if (snapshot.exists()) {
                                                     Toast.makeText(verify_email.this, "Email đã đăng ký", Toast.LENGTH_SHORT).show();
                                                 } else {
-                                                    // Set user data along with the generated ID (No ID input from user)
-                                                    usersRef.child(newUserIdStr).child("ID").setValue(newUserIdStr); // Store the generated ID
+                                                    usersRef.child(newUserIdStr).child("ID").setValue(newUserIdStr);
                                                     usersRef.child(newUserIdStr).child("Name").setValue(name_text);
                                                     usersRef.child(newUserIdStr).child("Email").setValue(email_text);
                                                     usersRef.child(newUserIdStr).child("Password").setValue(pass1_text);
                                                     usersRef.child(newUserIdStr).child("Sodienthoai").setValue(sodienthoai_text);
 
-                                                    // Update the lastUserId to the new ID
                                                     idRef.setValue(newUserId);
 
                                                     Toast.makeText(verify_email.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
 
-                                                    // Navigate to login page
                                                     Intent intent = new Intent(verify_email.this, login.class);
                                                     startActivity(intent);
-                                                    finish(); // Close the current activity
+                                                    finish();
                                                 }
                                             }
 
