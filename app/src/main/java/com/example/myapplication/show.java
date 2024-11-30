@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -80,24 +81,34 @@ public class show extends AppCompatActivity {
             String ten = name.getText().toString().trim();
             String password = pass.getText().toString().trim();
             String sodienthoai = sdt.getText().toString().trim();
-            update.setVisibility(View.INVISIBLE);
+            String phonePattern = "^(03|05|07|08|09)\\d{8}$";
+            String passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
+                    if (ten.isEmpty() || mail.isEmpty() || sodienthoai.isEmpty() || password.isEmpty()) {
+                        Toast.makeText(show.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                    } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(mail).matches()) {
+                        Toast.makeText(show.this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+                    } else if (!sodienthoai.matches(phonePattern)) {
+                        Toast.makeText(show.this, "Số điện thoại không hợp lệ", Toast.LENGTH_SHORT).show();
+                    } else if (!password.matches(passwordPattern)) {
+                        Toast.makeText(show.this, "Mật khẩu phải chứa ít nhất 8 ký tự, gồm 1 chữ in hoa, 1 số, và 1 ký tự đặc biệt", Toast.LENGTH_SHORT).show();
+                    } else {
+                        update.setVisibility(View.INVISIBLE);
+                        // Tạo mã OTP ngẫu nhiên
+                        String randomOTP = OTPngaunhien();
+                        // Gửi mã OTP qua Notification
+                        sendOTPNotification(randomOTP);
 
-            // Tạo mã OTP ngẫu nhiên
-            String randomOTP = OTPngaunhien();
-            // Gửi mã OTP qua Notification
-            sendOTPNotification(randomOTP);
-
-            // Chuyển sang màn hình verify_otp3
-            Intent otpIntent = new Intent(getApplicationContext(), verify_otp3.class);
-            otpIntent.putExtra("ID", id.getText().toString());
-            otpIntent.putExtra("Sodienthoai", sdt.getText().toString());
-            otpIntent.putExtra("name", name.getText().toString());
-            otpIntent.putExtra("email", email.getText().toString());
-            otpIntent.putExtra("Password", pass.getText().toString());
-            otpIntent.putExtra("verificationId", randomOTP); // This is your OTP
-            startActivity(otpIntent);
-            finish();
-
+                        // Chuyển sang màn hình verify_otp3
+                        Intent otpIntent = new Intent(getApplicationContext(), verify_otp3.class);
+                        otpIntent.putExtra("ID", id.getText().toString());
+                        otpIntent.putExtra("Sodienthoai", sdt.getText().toString());
+                        otpIntent.putExtra("name", name.getText().toString());
+                        otpIntent.putExtra("email", email.getText().toString());
+                        otpIntent.putExtra("Password", pass.getText().toString());
+                        otpIntent.putExtra("verificationId", randomOTP); // This is your OTP
+                        startActivity(otpIntent);
+                        finish();
+                    }
         });
     }
     // Phương thức tạo mã OTP ngẫu nhiên

@@ -37,7 +37,7 @@ public class update_pass extends AppCompatActivity {
         update.setOnClickListener(v -> {
             String password1 = nhappass.getText().toString().trim();
             String password2 = nhappass2.getText().toString().trim();
-
+            String passwordPattern = "^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$";
             // Kiểm tra mật khẩu hợp lệ
             if (TextUtils.isEmpty(password1) || TextUtils.isEmpty(password2)) {
                 Toast.makeText(update_pass.this, "Vui lòng nhập mật khẩu", Toast.LENGTH_SHORT).show();
@@ -49,6 +49,10 @@ public class update_pass extends AppCompatActivity {
             }
             if (password1.length() < 6) {
                 Toast.makeText(update_pass.this, "Mật khẩu có ít nhất 6 k ý tự", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (!password1.matches(passwordPattern)) {
+                Toast.makeText(update_pass.this, "Mật khẩu phải chứa ít nhất 1 chữ in hoa, 1 số và 1 ký tự đặc biệt, và dài tối thiểu 8 ký tự", Toast.LENGTH_SHORT).show();
                 return;
             }
 

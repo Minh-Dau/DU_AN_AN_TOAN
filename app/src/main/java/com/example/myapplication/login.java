@@ -104,9 +104,13 @@ public class login extends AppCompatActivity {
                                         verifyLogin(email);
 
                                     }
+                                    else{
+                                        // If no password matches
+                                        Toast.makeText(login.this, "Tên tài khoản hoặc mật khẩu sai!", Toast.LENGTH_SHORT).show();
+                                    }
+
                                 }
-                                // If no password matches
-                                Toast.makeText(login.this, "Tên tài khoản hoặc mật khẩu sai!", Toast.LENGTH_SHORT).show();
+
                             } else {
                                 Toast.makeText(login.this, "Tên tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
                             }

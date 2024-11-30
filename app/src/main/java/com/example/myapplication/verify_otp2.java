@@ -25,7 +25,7 @@ public class verify_otp2 extends AppCompatActivity {
 
     private EditText inputCode1, inputCode2, inputCode3, inputCode4, inputCode5, inputCode6;
     private String verificationId;
-
+    private TextView guilai;
     private String otp; // Lưu mã OTP đã gửi
 
     @Override
@@ -42,7 +42,7 @@ public class verify_otp2 extends AppCompatActivity {
         inputCode4 =findViewById(R.id.inputCode4);
         inputCode5 =findViewById(R.id.inputCode5);
         inputCode6 =findViewById(R.id.inputCode6);
-
+        guilai=findViewById(R.id.textResendOTP);
         setupOTPInputs();
 
         final ProgressBar progressBar = findViewById(R.id.progressBar);

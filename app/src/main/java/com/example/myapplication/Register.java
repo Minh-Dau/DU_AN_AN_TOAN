@@ -5,9 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +26,7 @@ public class Register extends AppCompatActivity {
     EditText name, email, sodienthoai, pass1, pass2;
     Button nhan_dangky;
     TextView nhan_dangnhap;
+    ImageView img_show1,img_show2;
     DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://duan-dff9f-default-rtdb.firebaseio.com/");
 
     @Override
@@ -37,7 +41,8 @@ public class Register extends AppCompatActivity {
         nhan_dangky = findViewById(R.id.btn_dangky);
         nhan_dangnhap = findViewById(R.id.edit_dangnhap);
         sodienthoai = findViewById(R.id.edit_sdt);
-
+        img_show1 = findViewById(R.id.img_show1);
+        img_show2 = findViewById(R.id.img_show2);
         nhan_dangnhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -46,6 +51,29 @@ public class Register extends AppCompatActivity {
                 finish();
             }
         });
+        if (img_show1 != null) {
+            img_show1.setOnClickListener(v -> {
+                if (pass1.getTransformationMethod() instanceof PasswordTransformationMethod) {
+                    pass1.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    img_show1.setImageResource(R.drawable.eye_open);
+                } else {
+                    pass1.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    img_show1.setImageResource(R.drawable.eye_close);
+                }
+            });
+        }
+
+        if (img_show2 != null) {
+            img_show2.setOnClickListener(v -> {
+                if (pass2.getTransformationMethod() instanceof PasswordTransformationMethod) {
+                    pass2.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    img_show2.setImageResource(R.drawable.eye_open);
+                } else {
+                    pass2.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    img_show2.setImageResource(R.drawable.eye_close);
+                }
+            });
+        }
 
         nhan_dangky.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,8 +128,6 @@ public class Register extends AppCompatActivity {
                                 }
                             }
                     );
-
-
                 }
             }
         });
