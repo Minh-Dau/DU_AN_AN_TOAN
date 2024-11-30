@@ -59,31 +59,66 @@
         </LinearLayout>
 
         <!-- Login button -->
-        <Button
-            android:id="@+id/btn_dangnhap"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="ĐĂNG NHẬP"
-            android:backgroundTint="#000000"
-            android:textColor="@android:color/white"
-            android:layout_marginBottom="10dp"/>
+            android:layout_height="match_parent"
+            >
+            <Button
+                android:id="@+id/btn_dangnhap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ĐĂNG NHẬP"
+                android:backgroundTint="#000000"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="10dp"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:visibility="gone"
+                />
+        </FrameLayout>
+
 
         <!-- "Register" link -->
+
+        <TextView
+            android:id="@+id/edit_quenmk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Quên mật khẩu?"
+            android:textColor="#0000FF"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bạn chưa có tài khoản? "
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp" />
+
         <TextView
             android:id="@+id/edit_dangky"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bạn chưa có tài khoản? Đăng ký"
-            android:textColor="#1b8a52"
+            android:text="Đăng ký"
+            android:textColor="#0000FF"
             android:textStyle="bold"
-            android:layout_gravity="center_horizontal" />
-        <TextView
-            android:id="@+id/edit_quenmatkhau"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Quên mật khẩu"
-            android:textStyle="bold"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="5dp" />
+
+    </LinearLayout>
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

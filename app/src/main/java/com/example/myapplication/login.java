@@ -103,5 +103,67 @@ public class login extends AppCompatActivity {
                 }
             }
         });
+
+        // Tạo mã OTP 6 chữ số
+        public static String generateOTP() {
+            int otp = (int) (Math.random() * 900000) + 100000; // Mã OTP 6 chữ số
+            return String.valueOf(otp);
+        }
+
+        // AsyncTask để gửi OTP trong background
+        private static class SendOTPAsyncTask extends AsyncTask<Void, Void, Void> {
+            private String email;
+            private String otp;
+            private Button nhan_dangnhap;
+            private ProgressBar progressBar;
+
+
+            SendOTPAsyncTask(String email, String otp, ProgressBar progressBar, Button nhan_dangnhap) {
+                this.email = email;
+                this.otp = otp;
+                this.progressBar = progressBar;
+                this.nhan_dangnhap = nhan_dangnhap;
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                // Gửi OTP email
+                EmailUtil.sendOTPEmail(email, otp);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                progressBar.setVisibility(View.GONE);
+                nhan_dangnhap.setVisibility(View.VISIBLE);
+
+                // Hiển thị thông báo gửi OTP thành công
+                Toast.makeText(nhan_dangnhap.getContext(), "OTP sent to " + email, Toast.LENGTH_SHORT).show();
+
+                // Chuyển đến màn hình xác thực OTP
+                Intent intent = new Intent(nhan_dangnhap.getContext(), verify_otp2.class);
+                intent.putExtra("email", email);
+                intent.putExtra("verificationId", otp);
+                nhan_dangnhap.getContext().startActivity(intent);
+            }
+        }
+
+
+        public void verifyLogin(String emailInput){
+            String email = emailInput.trim();
+
+            String otp = generateOTP(); // Tạo mã OTP
+
+            nhan_dangnhap.setVisibility(View.INVISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+
+
+
+            // Chạy AsyncTask để gửi OTP
+            new SendOTPAsyncTask(email, otp, progressBar, nhan_dangnhap).execute();
+        }
+
     }
 }
