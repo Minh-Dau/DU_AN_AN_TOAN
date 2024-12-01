@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -17,6 +18,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -49,18 +56,43 @@ public class send_otp extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
             btnGetOTP.setVisibility(View.INVISIBLE);
 
-            // Tạo mã OTP ngẫu nhiên
-            String randomOTP = generateOTP();
+            // Kiểm tra số điện thoại trong Firebase
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference usersRef = database.getReference("users"); // Đường dẫn đến nơi lưu số điện thoại
 
-            // Gửi mã OTP qua Notification
-            sendOTPNotification(randomOTP);
+            usersRef.orderByChild("Sodienthoai").equalTo(phoneNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    progressBar.setVisibility(View.GONE);
+                    btnGetOTP.setVisibility(View.VISIBLE);
 
-            // Chuyển đến màn hình verify_otp
-            Intent intent = new Intent(send_otp.this, verify_otp.class);
-            intent.putExtra("mobile", phoneNumber);
-            intent.putExtra("verificationId", randomOTP); // Truyền mã OTP qua Intent
-            startActivity(intent);
+                    if (dataSnapshot.exists()) {
+                        // Số điện thoại đã tồn tại -> Gửi mã OTP
+                        String randomOTP = generateOTP();
+                        sendOTPNotification(randomOTP);
+
+                        // Chuyển đến màn hình verify_otp
+                        Intent intent = new Intent(send_otp.this, verify_otp.class);
+                        intent.putExtra("mobile", phoneNumber);
+                        intent.putExtra("verificationId", randomOTP); // Truyền mã OTP qua Intent
+                        startActivity(intent);
+                    } else {
+                        // Số điện thoại chưa đăng ký
+                        Toast.makeText(send_otp.this, "Số điện thoại chưa được đăng ký!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    progressBar.setVisibility(View.GONE);
+                    btnGetOTP.setVisibility(View.VISIBLE);
+                    Toast.makeText(send_otp.this, "Đã xảy ra lỗi! Vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+                    Log.e("FirebaseError", databaseError.getMessage());
+                }
+            });
+
         });
+
     }
 
     private String generateOTP() {
