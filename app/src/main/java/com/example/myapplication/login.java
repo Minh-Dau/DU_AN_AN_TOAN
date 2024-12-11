@@ -78,43 +78,36 @@ public class login extends AppCompatActivity {
         nhan_dangnhap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String name_text = name.getText().toString();
-                String password_text = password.getText().toString();
+                String name_text = name.getText().toString().trim();
+                String password_text = password.getText().toString().trim();
+
                 if (name_text.isEmpty() || password_text.isEmpty()) {
                     Toast.makeText(login.this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 } else {
                     databaseReference.child("users").orderByChild("Name").equalTo(name_text).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            boolean isUserFound = false;
                             if (snapshot.exists()) {
-                                // Loop through all users with the same name (if any) and check the password
                                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                                     String getPassword = userSnapshot.child("Password").getValue(String.class);
                                     if (getPassword != null && getPassword.equals(password_text)) {
+                                        isUserFound = true;
                                         Toast.makeText(login.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-
-                                        // Retrieve user details
-                                         id = userSnapshot.child("ID").getValue(String.class);
-                                         username = userSnapshot.child("Name").getValue(String.class);
-                                         email = userSnapshot.child("Email").getValue(String.class);
-                                         phone = userSnapshot.child("Sodienthoai").getValue(String.class);
-                                         pass = userSnapshot.child("Password").getValue(String.class);
-
+                                        id = userSnapshot.child("ID").getValue(String.class);
+                                        username = userSnapshot.child("Name").getValue(String.class);
+                                        email = userSnapshot.child("Email").getValue(String.class);
+                                        phone = userSnapshot.child("Sodienthoai").getValue(String.class);
+                                        pass = userSnapshot.child("Password").getValue(String.class);
                                         verifyLogin(email);
-
+                                        break;
                                     }
-                                    else{
-                                        // If no password matches
-                                        Toast.makeText(login.this, "Tên tài khoản hoặc mật khẩu sai!", Toast.LENGTH_SHORT).show();
-                                    }
-
                                 }
-
-                            } else {
-                                Toast.makeText(login.this, "Tên tài khoản không tồn tại", Toast.LENGTH_SHORT).show();
+                            }
+                            if (!isUserFound) {
+                                Toast.makeText(login.this, "Tên tài khoản hoặc mật khẩu sai!", Toast.LENGTH_SHORT).show();
                             }
                         }
-
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
                             Toast.makeText(login.this, "Lỗi kết nối cơ sở dữ liệu", Toast.LENGTH_SHORT).show();
@@ -123,6 +116,7 @@ public class login extends AppCompatActivity {
                 }
             }
         });
+
 
     }
 
